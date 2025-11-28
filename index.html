@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINESTAR ULTIMATE - Đặt vé Online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="preloader">
+        <div class="loader-logo"><i class="fas fa-film"></i></div>
+        <div class="spinner"></div>
+    </div>
+
+    <header>
+        <div class="container nav-wrapper">
+            <div class="logo" onclick="switchPage('home')">
+                <i class="fas fa-play-circle"></i> CINE<span>STAR</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="#" class="active" data-page="home" onclick="switchPage('home')">Trang chủ</a></li>
+                <li><a href="#" data-page="showtimes" onclick="switchPage('showtimes')">Lịch chiếu</a></li>
+                <li><a href="#" data-page="mytickets" onclick="switchPage('mytickets')">Vé của tôi</a></li>
+                <li><a href="#" data-page="admin" onclick="switchPage('admin')">Quản trị</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <div class="user-menu" id="userMenuBtn" onclick="openLoginModal()">
+                    <i class="fas fa-user-circle"></i> <span>Đăng nhập</span>
+                </div>
+                <div class="mobile-toggle" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mobile-menu-overlay" onclick="toggleMobileMenu()"></div>
+        <div class="mobile-menu">
+            <div class="mobile-header">
+                <h3>MENU</h3>
+                <i class="fas fa-times" onclick="toggleMobileMenu()"></i>
+            </div>
+            <a href="#" onclick="mobileNav('home')"><i class="fas fa-home"></i> Trang chủ</a>
+            <a href="#" onclick="mobileNav('showtimes')"><i class="fas fa-calendar-alt"></i> Lịch chiếu</a>
+            <a href="#" onclick="mobileNav('mytickets')"><i class="fas fa-ticket-alt"></i> Vé của tôi</a>
+            <a href="#" onclick="mobileNav('admin')"><i class="fas fa-cogs"></i> Quản trị</a>
+        </div>
+    </header>
+
+    <section id="page-home" class="page active">
+        <div class="hero-slider">
+            <div class="slide-item active" style="background-image: url('https://image.tmdb.org/t/p/original/tMefBSflR6PGQLv7WvFPpKLZkyk.jpg')">
+                <div class="slide-content container">
+                    <span class="tag c13">C13</span>
+                    <h1>GODZILLA X KONG</h1>
+                    <p>Cuộc chiến của những vị vua cổ đại.</p>
+                    <div class="hero-actions">
+                        <button class="btn-primary glow" onclick="selectMovie(1)">MUA VÉ NGAY</button>
+                        <button class="btn-outline" onclick="playTrailer('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                            <i class="fas fa-play"></i> TRAILER
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container section-padding">
+            <div class="section-header">
+                <h2>PHIM ĐANG CHIẾU</h2>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Tìm tên phim..." onkeyup="searchMovie()">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="movies-grid" id="moviesGrid"></div>
+        </div>
+    </section>
+
+    <section id="page-showtimes" class="page">
+        <div class="container section-padding">
+            <h2>LỊCH CHIẾU HÔM NAY</h2>
+            <div class="date-scroll">
+                <div class="date-item active"><span>Hôm nay</span><b>28</b></div>
+                <div class="date-item"><span>Thứ 7</span><b>29</b></div>
+                <div class="date-item"><span>CN</span><b>30</b></div>
+            </div>
+            <div id="showtimesList" class="showtime-group"></div>
+        </div>
+    </section>
+
+    <section id="page-booking" class="page">
+        <div class="booking-container">
+            <div class="booking-left">
+                <div class="booking-header-mobile">
+                    <button onclick="switchPage('showtimes')"><i class="fas fa-arrow-left"></i></button>
+                    <span id="mobileMovieTitle">Đặt vé</span>
+                </div>
+                
+                <div class="booking-timer" id="bookingTimer">
+                    Thời gian giữ ghế: <span>05:00</span>
+                </div>
+
+                <div id="step-seat" class="step-view">
+                    <div class="screen-wrapper">
+                        <div class="screen">MÀN HÌNH</div>
+                    </div>
+                    <div id="seatsGrid"></div>
+                    <div class="seat-types">
+                        <div><span class="seat"></span> Thường</div>
+                        <div><span class="seat vip"></span> VIP</div>
+                        <div><span class="seat occupied"></span> Đã bán</div>
+                    </div>
+                </div>
+
+                <div id="step-food" class="step-view" style="display:none">
+                    <h3>Combo bắp nước</h3>
+                    <div id="comboList"></div>
+                </div>
+                
+                <div id="step-pay" class="step-view" style="display:none">
+                    <h3>Thanh toán</h3>
+                    <div class="payment-methods">
+                        <label class="pay-item active" onclick="selectPayment(this)"><i class="fas fa-wallet"></i> Momo <input type="radio" name="pay" checked></label>
+                        <label class="pay-item" onclick="selectPayment(this)"><i class="fas fa-qrcode"></i> VNPAY QR <input type="radio" name="pay"></label>
+                        <label class="pay-item" onclick="selectPayment(this)"><i class="fab fa-cc-visa"></i> Thẻ Quốc Tế <input type="radio" name="pay"></label>
+                    </div>
+                    <div class="input-box">
+                        <label>Thông tin nhận vé:</label>
+                        <input id="cusName" placeholder="Họ và tên">
+                        <input id="cusPhone" placeholder="Số điện thoại" type="tel">
+                    </div>
+                </div>
+            </div>
+
+            <div class="booking-right">
+                <div class="movie-summary">
+                    <img id="cartPoster" src="">
+                    <div>
+                        <h3 id="cartTitle">Tên Phim</h3>
+                        <p id="cartInfo">Rạp - Giờ</p>
+                    </div>
+                </div>
+                <div class="cart-items">
+                    <div class="row"><span>Ghế</span><b id="cartSeats">-</b></div>
+                    <div class="row"><span>Combo</span><b id="cartCombos">0</b></div>
+                </div>
+                <div class="total-section">
+                    <span>Tổng cộng</span>
+                    <strong id="cartTotal">0 đ</strong>
+                </div>
+                <div class="booking-actions">
+                    <button id="btnBack" class="btn-secondary" onclick="handleBack()" style="display:none">Quay lại</button>
+                    <button id="btnNext" class="btn-primary w-100" onclick="handleNext()">TIẾP TỤC</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="page-mytickets" class="page">
+        <div class="container section-padding">
+            <h2>VÉ ĐÃ ĐẶT</h2>
+            <div id="ticketHistoryList" class="ticket-grid"></div>
+        </div>
+    </section>
+
+    <section id="page-admin" class="page">
+        <div class="container section-padding">
+            <div class="admin-dashboard">
+                <div class="sidebar">
+                    <h3>ADMIN CP</h3>
+                    <button class="active" onclick="loadAdminTab('movies')"><i class="fas fa-film"></i> Quản lý Phim</button>
+                    <button onclick="loadAdminTab('stats')"><i class="fas fa-chart-bar"></i> Doanh thu</button>
+                    <button onclick="resetSystem()" class="warning"><i class="fas fa-trash-restore"></i> Reset Data</button>
+                    <button onclick="logoutAdmin()" class="danger"><i class="fas fa-sign-out-alt"></i> Thoát</button>
+                </div>
+                <div class="content" id="adminContent">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyright">© 2025 CineStar Ultimate. All Rights Reserved.</div>
+    </footer>
+
+    <div id="modalLogin" class="modal">
+        <div class="modal-dialog login-form">
+            <span class="close" onclick="closeModal('modalLogin')">&times;</span>
+            <h2>Đăng nhập</h2>
+            <p>Admin: admin / 123456</p>
+            <input type="text" id="loginUser" placeholder="Tài khoản">
+            <input type="password" id="loginPass" placeholder="Mật khẩu">
+            <button class="btn-primary w-100" onclick="handleLogin()">ĐĂNG NHẬP</button>
+        </div>
+    </div>
+    
+    <div id="modalTicket" class="modal">
+        <div class="modal-dialog ticket-dialog">
+            <span class="close" onclick="finishBookingFlow()">&times;</span>
+            
+            <div id="printableTicket" class="ticket-receipt">
+                <div class="ticket-header">
+                    <h2>CINESTAR</h2>
+                    <p>Vé Xem Phim Điện Tử</p>
+                </div>
+                <div class="ticket-body">
+                    <h1 id="ticketMovieName">MOVIE NAME</h1>
+                    <div class="ticket-info-row">
+                        <div><span class="label">Ngày</span><strong id="ticketDate">--/--</strong></div>
+                        <div><span class="label">Giờ</span><strong id="ticketTime">--:--</strong></div>
+                    </div>
+                    <div class="ticket-info-row">
+                        <div><span class="label">Ghế</span><strong id="ticketSeats" class="highlight">--</strong></div>
+                        <div><span class="label">Phòng</span><strong>Cinema 03</strong></div>
+                    </div>
+                    <div class="dashed-line"></div>
+                    <div class="ticket-qr-area">
+                        <div id="qrcode"></div> <p id="ticketCode">#CODE</p>
+                    </div>
+                    <div class="dashed-line"></div>
+                    <div class="ticket-total">
+                        <span>Thành tiền:</span>
+                        <span id="ticketPrice">0 đ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ticket-actions">
+                <button class="btn-primary" onclick="printTicket()"><i class="fas fa-print"></i> In Vé</button>
+                <button class="btn-secondary" onclick="finishBookingFlow()">Hoàn tất</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalTrailer" class="modal video-modal">
+        <div class="modal-dialog video-dialog">
+            <span class="close" onclick="closeTrailer()">&times;</span>
+            <video id="videoPlayer" controls width="100%">
+                <source id="videoSource" src="" type="video/mp4">
+                Trình duyệt không hỗ trợ video.
+            </video>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
